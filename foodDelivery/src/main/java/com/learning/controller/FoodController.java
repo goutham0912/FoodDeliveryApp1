@@ -119,14 +119,5 @@ public class FoodController {
 		
 	}
 	
-//	{
-//	    "foodName":"Dosa",
-//        "foodCost":30,
-//        "foodType":"Indian",
-//        "description":"Indian food",
-//        "foodPic":"indian food"
-//
-//   
-//	    
-//	}
+
 }
