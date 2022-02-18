@@ -15,9 +15,12 @@ spring:
     
     hibernate:
       naming:
-        physical-strategy: com.zee.zee5app.utils.CustomNamingRepository
+        physical-strategy: com.learning.utils.CustomNamingRepository
       ddl-auto: update
 server:
-  port: 9013
-  servlet:
-    context-path: /api
+  port: 9001
+  
+learning:
+  app:
+    jwtSecret: secretkey
+    jwtExpirationMs: 86400000

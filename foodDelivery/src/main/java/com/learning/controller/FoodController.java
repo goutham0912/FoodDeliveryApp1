@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,21 +24,37 @@ import com.learning.entity.Register;
 import com.learning.exception.IdNotFound;
 import com.learning.exception.LoginFailed;
 import com.learning.exception.RecordExists;
+import com.learning.payload.request.FoodRequest;
+import com.learning.payload.response.MessageResponse;
 import com.learning.service.FoodService;
 
 @RestController
-//@RequestMapping("/api")
+@RequestMapping("/api")
 public class FoodController {
 	@Autowired
 	FoodService foodService1;
 	@PostMapping("/food")
-	public ResponseEntity<?> addFood(@RequestBody Food food) 
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public ResponseEntity<?> addFood(@RequestBody FoodRequest foodRequest) 
 	{
+		Food food=new Food(foodRequest.getFoodName(), foodRequest.getFoodCost(), foodRequest.getDescription(), foodRequest.getFoodPic());
+		switch (foodRequest.getFoodType()) {
+		case "Indian":
+			food.setFoodType(FoodType.Indian);
+			break;
+		case "Mexican":
+			food.setFoodType(FoodType.Mexican);
+			break;
+		default:
+			food.setFoodType(FoodType.Chinese);
+			break;
+		}
+			
 		Food food2=foodService1.addFood(food);
-		return ResponseEntity.status(201).body(food2);
+		return ResponseEntity.status(201).body(new MessageResponse("Food added successfully"));
 			
 	}
-	
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@GetMapping("/food")
 	public ResponseEntity<?> updateFood()
 	{
@@ -54,6 +71,7 @@ public class FoodController {
 			return ResponseEntity.status(200).body(result.get());
 		
 	}
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@GetMapping(value="/food/{id}")
 	public ResponseEntity<?> getFoodById(@PathVariable("id") int id) throws IdNotFound
 	{
@@ -62,6 +80,7 @@ public class FoodController {
 		return ResponseEntity.status(200).body(food);
 		
 	}
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PutMapping("/food/{id1}")
 	public ResponseEntity<?> updateFood(@PathVariable("id1") int id,@RequestBody Food food) throws IdNotFound, RecordExists
 	{
@@ -69,6 +88,7 @@ public class FoodController {
 		return ResponseEntity.status(200).body(food1);
 
 	}
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@DeleteMapping("/food/{id2}")
 	public ResponseEntity<?> deleteFood(@PathVariable("id2") int id) throws IdNotFound
 	{
@@ -83,6 +103,7 @@ public class FoodController {
 		return ResponseEntity.status(404).body(hashMap);
 		
 	}
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@GetMapping("/food/foodType/{foodType}")
 	public ResponseEntity<?> getFoodById(@PathVariable("foodType") String foodType) throws IdNotFound
 	{
@@ -97,4 +118,15 @@ public class FoodController {
 		return ResponseEntity.status(200).body(food);
 		
 	}
+	
+//	{
+//	    "foodName":"Dosa",
+//        "foodCost":30,
+//        "foodType":"Indian",
+//        "description":"Indian food",
+//        "foodPic":"indian food"
+//
+//   
+//	    
+//	}
 }

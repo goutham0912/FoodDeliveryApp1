@@ -21,6 +21,7 @@ public class RegisterServiceImpl implements RegisterService {
 	public Register addUser(Register register) throws RecordExists {
 		// TODO Auto-generated method stub'
 		//add user data to database
+//		System.out.println(register.getFood());
 		if(registerRepository.existsByEmail(register.getEmail()))
 			throw new RecordExists("User Already Exists");
 		Register result=registerRepository.save(register);
