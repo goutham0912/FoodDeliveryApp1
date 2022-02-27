@@ -17,12 +17,14 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -44,7 +46,7 @@ import com.learning.service.RegisterService;
 //import com.zee.zee5app.payload.response.JwtResponse;
 
 import antlr.collections.List;
-
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/api")
 public class UserController {
@@ -61,9 +63,9 @@ public class UserController {
 	@Autowired
 	PasswordEncoder passwordEncoder;
 @PostMapping("/register")
-//@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
 public ResponseEntity<?> addUser(@RequestBody SignUpRequest signUpRequest) throws RecordExists
 {
+	System.out.println(signUpRequest);
 	if(registerRepository
 			.existsByEmail(signUpRequest.getEmail()))
 	{
@@ -149,6 +151,8 @@ public ResponseEntity<?> updateUser(@PathVariable("id") int id,@RequestBody Regi
 	return ResponseEntity.status(200).body(register1);
 
 }
+
+
 @DeleteMapping("/users/{id}")
 @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
 public ResponseEntity<?> deleteUser(@PathVariable("id") int id) throws IdNotFound
@@ -157,6 +161,19 @@ public ResponseEntity<?> deleteUser(@PathVariable("id") int id) throws IdNotFoun
 	return ResponseEntity.status(200).body(register);
 	
 }
+@GetMapping("/auth")
+public ResponseEntity<?> getUser(@RequestHeader(name="Authorization") String token)
+{
+	String token1=token.substring(7, token.length());
+	String userName=jwtUtils.getUserNameFromJwtToken(token1);
+	System.out.println(userName);
+	Optional<Register> register=registerRepository.findByEmail(userName);
+	
+	
+	return ResponseEntity.status(200).body(register.get());
+	
+}
+
 //{
 //    
 //    "email":"goutham2@gmailcom",
@@ -166,5 +183,6 @@ public ResponseEntity<?> deleteUser(@PathVariable("id") int id) throws IdNotFoun
 //
 //    
 //}
-
+//user-eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnb3V0aGFtNkBnbWFpbGNvbSIsImlhdCI6MTY0NTE3MDYzMCwiZXhwIjoxNjQ1MjU3MDMwfQ.vQt8lmk6UAY1N5d7wj87vNV0VGqmVwzgq7-hQKiAtieObrsGcLHmC_Yg5770qP83it6bme4ey1NkvCl705dJWw
+//admin-eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnb3V0aGFtNUBnbWFpbGNvbSIsImlhdCI6MTY0NTE3MDY2MywiZXhwIjoxNjQ1MjU3MDYzfQ.pwZBpOKelwflWFFFsteP5uBkdneIEY7kscHgXSwOq6giQ4K0zSmkgLN38Bz_irrXac3LGZ-gGxWn6SWUJsAf3g
 }

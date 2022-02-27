@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,7 +28,7 @@ import com.learning.exception.RecordExists;
 import com.learning.payload.request.FoodRequest;
 import com.learning.payload.response.MessageResponse;
 import com.learning.service.FoodService;
-
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/api")
 public class FoodController {
@@ -54,7 +55,7 @@ public class FoodController {
 		return ResponseEntity.status(201).body(new MessageResponse("Food added successfully"));
 			
 	}
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
 	@GetMapping("/food")
 	public ResponseEntity<?> updateFood()
 	{
@@ -71,7 +72,7 @@ public class FoodController {
 			return ResponseEntity.status(200).body(result.get());
 		
 	}
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
 	@GetMapping(value="/food/{id}")
 	public ResponseEntity<?> getFoodById(@PathVariable("id") int id) throws IdNotFound
 	{
@@ -119,5 +120,14 @@ public class FoodController {
 		
 	}
 	
-
+//	{
+//	    "foodName":"Dosa",
+//        "foodCost":30,
+//        "foodType":"Indian",
+//        "description":"Indian food",
+//        "foodPic":"indian food"
+//
+//   
+//	    
+//	}
 }
